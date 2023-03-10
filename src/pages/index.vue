@@ -6,6 +6,6 @@ defineOptions({
 
 <template>
   <div>
-    home
+    <UserMap />
   </div>
 </template>
