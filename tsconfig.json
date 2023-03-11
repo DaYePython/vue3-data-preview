@@ -26,7 +26,8 @@
   "vueCompilerOptions": {
     "plugins": [
       "@vue-macros/volar/define-model",
-      "@vue-macros/volar/define-slots"
+      "@vue-macros/volar/define-slots",
+      "@vue-macros/volar/define-props-refs"
     ]
   },
   "exclude": ["dist", "node_modules"]

@@ -1,92 +1,66 @@
 <script lang="ts" setup>
-import { PointLayer, Popup, Scene } from '@antv/l7'
-import { GaodeMap } from '@antv/l7-maps'
-import cityData from '~/data/cityData.json'
-import { throttle } from '~/utils/events'
+import { Popup } from '@antv/l7'
+import { storeToRefs } from 'pinia'
+import { render } from 'vue'
+import useUserMap from './useUserMap'
+import PopupData from './PopupData.vue'
+import { usePointLayer } from '~/composables'
+import { CITY_DATE_LAYER } from '~/constants/map'
+import type { ICityList } from '~/stores/useCityData'
+import { useCityData } from '~/stores/useCityData'
+
 const map = ref<HTMLDivElement>()
 const mapContainer = ref<HTMLDivElement>()
 
-const scene = shallowRef<Scene>()
+const cityDataStore = useCityData()
+const { cityList } = storeToRefs(cityDataStore)
+// const popupData = shallowRef<any>({
+//   cityName: '',
+//   openUserCount: 0,
+//   iotDoorControlCount: 0,
+//   communityCount: 0,
+//   cityCode: '',
+// })
 
-onMounted(() => {
+async function handleMouseMove({ feature, lngLat }: { feature: ICityList; lngLat: [number, number] }) {
+  const { cityCode, cityName, openUserCount, iotDoorControlCount, communityCount } = feature
+  const popupData = {
+    cityName,
+    openUserCount,
+    iotDoorControlCount,
+    communityCount,
+    cityCode,
+  }
+  const div = document.createElement('div')
+  render(h(PopupData, popupData), div)
+  // await nextTick()
+  const popup = new Popup({
+    offsets: [0, 0],
+    closeButton: false,
+    style: 'dark',
+    className: 'city-popup',
+  })
+    .setLnglat(lngLat)
+    // DONE 抽离Popup组件 setDomContent
+    .setHTML(div)
+  await nextTick()
+  return popup
+}
+
+onMounted(async () => {
   if (map.value === undefined)
     return
-  scene.value = new Scene({
-    id: map.value,
-    map: new GaodeMap({
-      pitch: 0,
-      style: 'dark',
-      mapStyle: 'amap://styles/darkblue',
-      center: [113.631419, 34.753439],
-      zoom: 5,
-      // token: 'ced0d726cd96553ba8b5b3521671aaf4',
-    }),
-  })
-  scene.value.on('loaded', () => {
-    const { code = 1, data = { cityList: [] } } = cityData
-    const { cityList } = data
-    if (code !== 0)
-      return
-    const cityListData = cityList.sort((a, b) => {
-      return a.communityCount - b.communityCount
-    }).map((t, index) => {
-      let res: typeof t & { count: number }
-      if (t.communityCount === 1) {
-        res = {
-          ...t,
-          count: 1,
-        }
-      }
-
-      else {
-        res = {
-          ...t,
-          count: 101 + index * 0.1,
-        }
-      }
-      return res
+  const { initMap, onLoad, addLayer, addPopup } = useUserMap(map as Ref<HTMLDivElement>)
+  onLoad(async () => {
+    await cityDataStore.getCityData()
+    const { pointLayer, onMousemove } = usePointLayer<ICityList[] | undefined>(CITY_DATE_LAYER, cityList)
+    onMousemove(async (e) => {
+      const popup = await handleMouseMove(e as any)
+      addPopup(popup)
     })
-    const pointLayer = new PointLayer({ zIndex: 1 })
-      .source(cityListData, {
-        parser: {
-          type: 'json',
-          x: 'longitude',
-          y: 'latitude',
-        },
-      })
-      .shape('circle')
-      .animate(true)
-      .size('count', [0, 45])
-      .color('count', [
-        '#3CA0FF',
-        '#3CA0FF',
-        '#3CA0FF',
-      ])
-      .active(true)
-      .style({
-        opacity: 0.5,
-        strokeWidth: 0,
-      })
-    pointLayer.on('mousemove', throttle(
-      ({ feature, lngLat }) => {
-        const { cityName, openUserCount, iotDoorControlCount, communityCount } = feature
-        const popup = new Popup({
-          offsets: [0, 0],
-          closeButton: false,
-          style: 'dark',
-        })
-          .setLnglat(lngLat)
-        // TODO 抽离Popup组件 setDomContent
-          .setHTML(`<span>区域 &nbsp; ${cityName}</span><br>
-                  <span>开门用户 &nbsp; ${openUserCount}</span></br>
-                  <span>设备总数  &nbsp; ${iotDoorControlCount}</span></br>
-                  <span>小区总数 &nbsp; ${communityCount}</span></br>
-                  `)
-        scene.value?.addPopup(popup)
-      }, 500, { leading: true, trailing: false }),
-    )
-    scene.value?.addLayer(pointLayer)
+    addLayer(pointLayer.value)
   })
+  await initMap()
 })
 </script>
 
