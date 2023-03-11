@@ -3,7 +3,7 @@ import { Popup } from '@antv/l7'
 import { storeToRefs } from 'pinia'
 import { render } from 'vue'
 import useUserMap from './useUserMap'
-import PopupData from './PopupData.vue'
+// import PopupData from './PopupData.vue'
 import { usePointLayer } from '~/composables'
 import { CITY_DATE_LAYER } from '~/constants/map'
 import type { ICityList } from '~/stores/useCityData'
@@ -32,7 +32,21 @@ async function handleMouseMove({ feature, lngLat }: { feature: ICityList; lngLat
     cityCode,
   }
   const div = document.createElement('div')
-  render(h(PopupData, popupData), div)
+  render(h(defineAsyncComponent({
+  // 加载函数
+    loader: () => import('./PopupData.vue'),
+
+    // 加载异步组件时使用的组件
+    loadingComponent: h('加载中...'),
+    // 展示加载组件前的延迟时间，默认为 200ms
+    delay: 200,
+
+    // 加载失败后展示的组件
+    errorComponent: h('错误处理') as any,
+    // 如果提供了一个 timeout 时间限制，并超时了
+    // 也会显示这里配置的报错组件，默认值是：Infinity
+    timeout: 3000,
+  }), popupData), div)
   // await nextTick()
   const popup = new Popup({
     offsets: [0, 0],

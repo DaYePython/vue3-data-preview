@@ -48,10 +48,10 @@ export const useCityData = defineStore('cityData', () => {
     cityData.value = data
     return data
   }
-  // const cityCount = computed(() => cityData.value?.cityCount)
-  // const cityInfoList = computed(() => {})
-  // const iotdoorControlCount = computed(() => cityData.value?.iotdoorControlCount)
-  // const userCommunity = computed(() => cityData.value?.userCommunity)
+  const cityCount = computed(() => cityData.value?.cityCount)
+  const cityInfoList = computed(() => {})
+  const iotdoorControlCount = computed(() => cityData.value?.iotdoorControlCount)
+  const userCommunity = computed(() => cityData.value?.userCommunity)
   const communityCount = computed(() => cityData.value?.communityCount)
   const cityList = computed(() =>
     cityData.value?.cityList
@@ -67,6 +67,10 @@ export const useCityData = defineStore('cityData', () => {
       }))
 
   return {
+    cityCount,
+    iotdoorControlCount,
+    userCommunity,
+
     cityData,
     cityList,
     communityCount,
