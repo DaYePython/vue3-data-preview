@@ -42,8 +42,8 @@ async function handleMouseMove({ feature, lngLat }: { feature: ICityList; lngLat
   })
     .setLnglat(lngLat)
     // DONE 抽离Popup组件 setDomContent
-    .setHTML(div)
-  await nextTick()
+    .setHTML(div.firstChild as HTMLElement)
+  // await nextTick()
   return popup
 }
 
