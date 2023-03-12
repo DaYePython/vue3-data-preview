@@ -1,0 +1,12 @@
+.city-popup .l7-popup-content{
+  width: 250px;
+  padding: 3px 5px;
+  /* height: 125px; */
+  background: rgba(34, 86, 178, 0.7);
+  border-radius: 6px;
+  border: 1px solid rgba(56, 155, 255, 0.25);
+}
+.city-popup .l7-popup-tip{
+  border-bottom-width: 0;
+  border-top-color: rgba(34, 86, 178, 0.7);
+}
