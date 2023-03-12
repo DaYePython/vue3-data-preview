@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { /* hoist-static */ formatNumberWithCommas, formaterFloatToFixed } from '../../utils'
 import usePopupData from './usePopupData'
-
 const {
   openUserCount,
   cityName,
@@ -8,31 +8,28 @@ const {
   communityCount,
 } = definePropsRefs<
   {
-    cityName: String
-    openUserCount: Number
-    iotDoorControlCount: Number
-    communityCount: Number
-    cityCode: String
+    cityName: string
+    openUserCount: number
+    iotDoorControlCount: number
+    communityCount: number
+    cityCode: string
   }>()
 
-// await nextTick()
 const {
   iotPercentage,
   openPercentage,
   communityPercentage,
 } = usePopupData(
-  iotDoorControlCount as ComputedRef<number>,
-  openUserCount as ComputedRef<number>,
-  communityCount as ComputedRef<number>,
+  iotDoorControlCount,
+  openUserCount,
+  communityCount,
 )
-onMounted(() => {
-  drawPopover([openPercentage, iotPercentage, communityPercentage])
-})
+
 function drawPopover(arrList: Array<ComputedRef<number>>) {
   const canvas = document.getElementById('cityPopover') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')
-  if (!ctx)
+  if (!canvas)
     return
+  const ctx = canvas.getContext('2d')!
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   // 填充画布
   ctx.lineWidth = 8
@@ -69,7 +66,7 @@ function drawPopover(arrList: Array<ComputedRef<number>>) {
       ctx.fillStyle = 'white'// 文本颜色
       ctx.font = '12px normal '
       ctx.textAlign = 'right'
-      ctx.fillText(`${(t.value * 100).toFixed(1)}%`, 55, (index + 1) * 16)
+      ctx.fillText(`${formaterFloatToFixed(t.value * 100, 2)}%`, 55, (index + 1) * 16)
     })
   })
 }
@@ -77,12 +74,6 @@ function drawPopover(arrList: Array<ComputedRef<number>>) {
 watchPostEffect(() => {
   drawPopover([openPercentage, iotPercentage, communityPercentage])
 })
-
-function formaterNumber(num: Number): string {
-  return new Intl.NumberFormat('en-US').format(num)
-}
-
-// debugger
 </script>
 
 <template>
@@ -97,13 +88,13 @@ function formaterNumber(num: Number): string {
       </div>
       <section class="tips space-y-xs" children-flex children-justify-center children-items-center>
         <div class="before:bg-[#3AACF3]">
-          开门用户{{ formaterNumber(openUserCount) }}
+          开门用户{{ formatNumberWithCommas(openUserCount) }}
         </div>
         <div class="before:bg-[#5AD8A6]">
-          设备总数 {{ formaterNumber(iotDoorControlCount) }}
+          设备总数 {{ formatNumberWithCommas(iotDoorControlCount) }}
         </div>
         <div class="before:bg-[#FF6A00]">
-          小区总数{{ formaterNumber(communityCount) }}
+          小区总数{{ formatNumberWithCommas(communityCount) }}
         </div>
       </section>
     </section>
@@ -115,11 +106,12 @@ function formaterNumber(num: Number): string {
 </style>
 
 <style>
-.city-popup{
+/* .city-popup{
   width: 150px;
-}
+} */
 .city-popup .l7-popup-content{
   width: 250px;
+  padding: 3px 5px;
   /* height: 125px; */
   background: rgba(34, 86, 178, 0.7);
   border-radius: 6px;
@@ -137,14 +129,5 @@ function formaterNumber(num: Number): string {
   display: inline-block;
   margin-right: 5px;
   border-radius: 50%;
-}
-.city-popup .tips:first-child::before{
-  background: #3AACF3;
-}
-.city-popup .tips:nth-child(2)::before{
-  background: #5AD8A6;
-}
-.city-popup .tips:nth-child(3)::before{
-  background: #FF6A00;
 }
 </style>

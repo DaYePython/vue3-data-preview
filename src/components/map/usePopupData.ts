@@ -8,7 +8,7 @@ export default function (iotDoorControlCount: MaybeComputedRef<number>, openUser
   function handlePrecentage(left: number, right: number) {
     try {
       const precentage = +(left / right)
-      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(Math.max(0.01, precentage))
+      return Math.max(0.0001, precentage)
     }
     catch (e) {
       console.error(e)
