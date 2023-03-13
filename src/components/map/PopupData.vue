@@ -79,7 +79,7 @@ watchPostEffect(() => {
 <template>
   <transition>
     <section text-white>
-      <h1 text="base">
+      <h1 text="lg left" pl-2 pb-1>
         {{ cityName }}
       </h1>
       <!-- <VChart id="gauge" class="w-120px !min-h-120px !h-120px" type="gauge" :options="ringDataOptions" /> -->
