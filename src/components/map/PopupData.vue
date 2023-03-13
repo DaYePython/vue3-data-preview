@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { /* hoist-static */ formatNumberWithCommas, formaterFloatToFixed } from '../../utils'
 import usePopupData from './usePopupData'
+import { /* hoist-static */ formatNumberWithCommas, formaterFloatToFixed } from '~/utils'
 const {
   openUserCount,
   cityName,
@@ -83,20 +83,26 @@ watchPostEffect(() => {
         {{ cityName }}
       </h1>
       <!-- <VChart id="gauge" class="w-120px !min-h-120px !h-120px" type="gauge" :options="ringDataOptions" /> -->
-      <div flex justify-center item-center>
-        <canvas id="cityPopover" ref="cityPopover" w-120px h-120px width="120" height="120" />
+      <div class="flex">
+        <div mr-1>
+          <canvas id="cityPopover" ref="cityPopover" w-120px h-120px width="120" height="120" />
+        </div>
+        <section
+          class="tips"
+          flex-1 flex flex-col items-start justify-end gap-1 pb-3
+          children-relative children-flex children-w-full children-items-center children-break-all
+        >
+          <div class="before:bg-[#3AACF3]">
+            开门用户<span flex-1>{{ formatNumberWithCommas(openUserCount) }}</span>
+          </div>
+          <div class="before:bg-[#5AD8A6]">
+            设备总数 <span flex-1>{{ formatNumberWithCommas(iotDoorControlCount) }}</span>
+          </div>
+          <div class="before:bg-[#FF6A00]">
+            小区总数 <span flex-1>{{ formatNumberWithCommas(communityCount) }}</span>
+          </div>
+        </section>
       </div>
-      <section class="tips space-y-xs" children-flex children-justify-center children-items-center>
-        <div class="before:bg-[#3AACF3]">
-          开门用户{{ formatNumberWithCommas(openUserCount) }}
-        </div>
-        <div class="before:bg-[#5AD8A6]">
-          设备总数 {{ formatNumberWithCommas(iotDoorControlCount) }}
-        </div>
-        <div class="before:bg-[#FF6A00]">
-          小区总数{{ formatNumberWithCommas(communityCount) }}
-        </div>
-      </section>
     </section>
   </transition>
 </template>
@@ -106,26 +112,14 @@ watchPostEffect(() => {
 </style>
 
 <style>
-/* .city-popup{
-  width: 150px;
-} */
-.city-popup .l7-popup-content{
-  width: 250px;
-  padding: 3px 5px;
-  /* height: 125px; */
-  background: rgba(34, 86, 178, 0.7);
-  border-radius: 6px;
-  border: 1px solid rgba(56, 155, 255, 0.25);
-}
-.city-popup .l7-popup-tip{
-  border-bottom-width: 0;
-  border-top-color: rgba(34, 86, 178, 0.7);
-}
-
 .city-popup .tips > *::before{
+  position: absolute;
   content: " ";
   width: 8px;
   height: 8px;
+  top: 50%;
+  transform: translate(0, -50%);
+  left:-10px;
   display: inline-block;
   margin-right: 5px;
   border-radius: 50%;

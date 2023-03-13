@@ -47,11 +47,10 @@ async function handleMouseMove({ feature, lngLat }: { feature: ICityList; lngLat
     // 也会显示这里配置的报错组件，默认值是：Infinity
     timeout: 3000,
   }), popupData), div)
-  // await nextTick()
+  await nextTick()
   const popup = new Popup({
     offsets: [0, 0],
     closeButton: false,
-    style: 'dark',
     className: 'city-popup',
   })
     .setLnglat(lngLat)
