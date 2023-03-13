@@ -21,6 +21,7 @@ export default defineConfig({
       warn: true,
     }),
     presetWebFonts({
+      provider: 'fontshare',
       fonts: {
         sans: 'DM Sans',
         serif: 'DM Serif Display',
