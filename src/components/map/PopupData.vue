@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import usePopupData from './usePopupData'
 import { /* hoist-static */ formatNumberWithCommas, formaterFloatToFixed } from '~/utils'
+import { /* hoist-static */ POPUP_ELEMENT_ID } from '~/constants/map'
 const {
   openUserCount,
   cityName,
@@ -72,39 +73,43 @@ function drawPopover(arrList: Array<ComputedRef<number>>) {
 }
 
 watchPostEffect(() => {
+  if (!cityName.value)
+    return
   drawPopover([openPercentage, iotPercentage, communityPercentage])
 })
 </script>
 
 <template>
-  <transition>
-    <section text-white>
-      <h1 text="lg left" pl-2 pb-1>
-        {{ cityName }}
-      </h1>
-      <!-- <VChart id="gauge" class="w-120px !min-h-120px !h-120px" type="gauge" :options="ringDataOptions" /> -->
-      <div class="flex">
-        <div mr-1>
-          <canvas id="cityPopover" ref="cityPopover" w-120px h-120px width="120" height="120" />
+  <teleport to="body" :disabled="!cityName">
+    <transition>
+      <section :id="POPUP_ELEMENT_ID" text-white :class="!cityName ? 'invisible' : ''">
+        <h1 text="lg left" pl-2 pb-1>
+          {{ cityName }}
+        </h1>
+        <!-- <VChart id="gauge" class="w-120px !min-h-120px !h-120px" type="gauge" :options="ringDataOptions" /> -->
+        <div class="flex">
+          <div mr-1>
+            <canvas id="cityPopover" ref="cityPopover" w-120px h-120px width="120" height="120" />
+          </div>
+          <section
+            class="tips"
+            flex-1 flex flex-col items-start justify-end gap-1 pb-3
+            children-relative children-flex children-w-full children-items-center children-break-all
+          >
+            <div class="before:bg-[#3AACF3]">
+              开门用户<span flex-1>{{ formatNumberWithCommas(openUserCount) }}</span>
+            </div>
+            <div class="before:bg-[#5AD8A6]">
+              设备总数 <span flex-1>{{ formatNumberWithCommas(iotDoorControlCount) }}</span>
+            </div>
+            <div class="before:bg-[#FF6A00]">
+              小区总数 <span flex-1>{{ formatNumberWithCommas(communityCount) }}</span>
+            </div>
+          </section>
         </div>
-        <section
-          class="tips"
-          flex-1 flex flex-col items-start justify-end gap-1 pb-3
-          children-relative children-flex children-w-full children-items-center children-break-all
-        >
-          <div class="before:bg-[#3AACF3]">
-            开门用户<span flex-1>{{ formatNumberWithCommas(openUserCount) }}</span>
-          </div>
-          <div class="before:bg-[#5AD8A6]">
-            设备总数 <span flex-1>{{ formatNumberWithCommas(iotDoorControlCount) }}</span>
-          </div>
-          <div class="before:bg-[#FF6A00]">
-            小区总数 <span flex-1>{{ formatNumberWithCommas(communityCount) }}</span>
-          </div>
-        </section>
-      </div>
-    </section>
-  </transition>
+      </section>
+    </transition>
+  </teleport>
 </template>
 
 <style scoped>
